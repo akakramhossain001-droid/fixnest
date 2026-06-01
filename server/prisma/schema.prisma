@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String?
+  googleId  String?  @unique
+  phone     String?
+  role         String    @default("customer") // "customer" or "provider"
+  isBlocked    Boolean   @default(false)
+  referralCode String?   @unique
+  referredBy   String?
+  bookings     Booking[]
+  reviews      Review[]
+  wallet       Wallet?
+  addresses    Address[]
+  notifications Notification[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Provider {
+  id          String   @id @default(uuid())
+  name        String
+  avatar      String
+  category    String
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  price       Int      @default(0)
+  description String?
+  isTopRated  Boolean  @default(false)
+  bookings    Booking[]
+  reviews     Review[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  providerId   String
+  provider     Provider @relation(fields: [providerId], references: [id])
+  service      String
+  date         String   // Storing as ISO date string
+  time         String
+  address      String
+  price        Int
+  status       String   @default("upcoming") // "upcoming", "completed", "cancelled"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Wallet {
+  id           String        @id @default(uuid())
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id])
+  balance      Float         @default(0)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  walletId    String
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  amount      Float
+  type        String   // "credit" or "debit"
+  title       String
+  createdAt   DateTime @default(now())
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  rating      Int
+  text        String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  providerId  String
+  provider    Provider @relation(fields: [providerId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String   // e.g. "Home", "Office"
+  address     String   // The full text address
+  lat         Float?   // Optional for now
+  lng         Float?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   // 'booking', 'wallet', 'security', 'system'
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+
+
