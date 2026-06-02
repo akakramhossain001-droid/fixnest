@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 
 // Strict CORS Policy
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:3000', 'https://app-two-psi-80.vercel.app', 'https://app-dymltfang-akram-s-projects17.vercel.app'];
+const allowedOrigins = ['http://localhost', 'capacitor://localhost', 'http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:3000', 'https://app-two-psi-80.vercel.app', 'https://app-dymltfang-akram-s-projects17.vercel.app'];
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
